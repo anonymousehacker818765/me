@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy 10th Birthday Rishika!</title>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        /* Deep Space Theme */
+        body {
+            margin: 0;
+            background: #0b0d17;
+            background-image: radial-gradient(circle at top right, #1b2735 0%, #090a0f 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            background: transparent url('https://www.transparenttextures.com/patterns/stardust.png') repeat top center;
+            animation: twinkle 3s infinite alternate;
+        }
+        @keyframes twinkle { 0% { opacity: 0.3; } 100% { opacity: 1; } }
+
+        /* Stage 1: Launchpad */
+        #launchpad {
+            height: 100vh;
+            display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            text-align: center; padding: 20px;
+        }
+
+        #launch-rocket {
+            font-size: 80px; cursor: pointer; user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            animation: pulse 1.5s infinite; transition: transform 0.1s;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(0,229,255,0.5)); }
+            50% { transform: scale(1.1); filter: drop-shadow(0 0 20px rgba(0,229,255,0.9)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(0,229,255,0.5)); }
+        }
+        #launch-rocket:active { transform: scale(0.8) translateY(-10px); animation: none; }
+
+        .progress-bar {
+            width: 80%; max-width: 300px; height: 20px;
+            background: #263238; border-radius: 10px; margin-top: 30px;
+            overflow: hidden; border: 2px solid #00e5ff; box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+        }
+        #fuel-level {
+            height: 100%; width: 0%;
+            background: linear-gradient(90deg, #ff4081, #00e5ff);
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Stage 2: Timeline Container */
+        #timeline-container {
+            display: none; position: relative;
+            padding-top: 50px; padding-bottom: 50px;
+            width: 100%; max-width: 500px; margin: 0 auto;
+        }
+
+        .timeline-line {
+            position: absolute; top: 0; bottom: 0; left: 40px;
+            width: 4px; background: rgba(0, 229, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.6); z-index: 1;
+        }
+
+        #flying-rocket {
+            position: fixed; top: -100px; left: 20px; z-index: 10;
+            text-align: center; transition: top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex; flex-direction: column; align-items: center;
+        }
+        #flying-rocket .icon { font-size: 40px; transform: rotate(180deg); transition: transform 0.3s; }
+        #flying-rocket .name-tag {
+            background: linear-gradient(45deg, #ff4081, #d500f9); color: white;
+            font-size: 12px; font-weight: bold; padding: 5px 12px;
+            border-radius: 15px; margin-top: 5px; box-shadow: 0 4px 15px rgba(255, 64, 129, 0.6);
+        }
+
+        .timeline-header {
+            text-align: center; margin-left: 60px; padding: 0 20px 40px 0;
+            animation: fadeInDown 1s ease-out;
+        }
+        .timeline-header h1 { color: #00e5ff; font-size: 30px; text-shadow: 0 0 10px rgba(0,229,255,0.5); }
+        .timeline-header p { color: #e0e0e0; font-size: 16px; line-height: 1.6; }
+
+        /* Memory Cards & Captions */
+        .memory-card {
+            position: relative; margin-left: 70px; margin-right: 20px; margin-bottom: 50px;
+            background: rgba(21, 27, 41, 0.8); border: 2px solid #37474f;
+            border-radius: 15px; padding: 15px; box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+            z-index: 2; opacity: 0; transform: translateY(40px) scale(0.95);
+            transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .memory-card.reveal { opacity: 1; transform: translateY(0) scale(1); border-color: #00e5ff; }
+
+        .memory-card::before {
+            content: ''; position: absolute; top: 40px; left: -38px;
+            width: 16px; height: 16px; background: #ff4081; border-radius: 50%;
+            box-shadow: 0 0 15px #ff4081; transition: background 0.3s;
+        }
+        .memory-card.reveal::before { background: #00e5ff; box-shadow: 0 0 15px #00e5ff; }
+
+        .memory-img { width: 100%; border-radius: 10px; object-fit: contain; display: block; }
+        
+        .memory-caption {
+            margin-top: 15px; margin-bottom: 0; color: #b0bec5;
+            font-size: 15px; font-style: italic; line-height: 1.4;
+            border-left: 3px solid #ff4081; padding-left: 10px;
+        }
+
+        /* Cake Section at the Bottom */
+        #cake-section {
+            text-align: center; margin-left: 60px; padding: 40px 20px 80px 0;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .cake-emoji {
+            font-size: 70px; cursor: pointer; user-select: none;
+            -webkit-tap-highlight-color: transparent; transition: transform 0.3s;
+            filter: drop-shadow(0 0 15px rgba(255, 64, 129, 0.5));
+        }
+        .cake-emoji:active { transform: scale(0.9); }
+        .cake-text { color: #ff4081; font-weight: bold; margin-top: 10px; font-size: 18px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="stars"></div>
+
+    <audio id="bg-music" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="launchpad">
+        <h1 style="color: #00e5ff; text-shadow: 0 0 15px rgba(0,229,255,0.5);">Mission: 10th Birthday</h1>
+        <p id="instruction" style="color: #b0bec5; font-size: 18px;">Tap the rocket 10 times to fuel up!</p>
+        <div id="launch-rocket" onclick="addFuel()">🚀</div>
+        <div class="progress-bar"><div id="fuel-level"></div></div>
+    </div>
+
+    <div id="flying-rocket">
+        <div class="icon">🚀</div>
+        <div class="name-tag">RISHIKA</div>
+    </div>
+
+    <div id="timeline-container">
+        <div class="timeline-line"></div>
+        
+        <div class="timeline-header">
+            <h1>Happy 10th Birthday! 🌌</h1>
+            <p>Welcome to double digits, Rishika! Here is a journey through my favorite mission logs with you.</p>
+        </div>
+
+        <div id="memories-wrapper"></div>
+        
+        <div id="cake-section">
+            <h2 style="color: #00e5ff;">Mission Complete!</h2>
+            <p style="color: #e0e0e0; margin-bottom: 20px;">I miss you tons. Time to celebrate!</p>
+            <div class="cake-emoji" onclick="cutCake(this)">🎂</div>
+            <p class="cake-text">Tap to cut the cake!</p>
+        </div>
+    </div>
+
+    <script>
+        // --- CAPTIONS ARRAY ---
+        // Edit the text inside the quotes for each of your 23 images.
+// --- CAPTIONS ARRAY ---
+        const imageCaptions = [
+            "Mission Log 01: The coolest 10-year-old astronaut in the galaxy.",
+            "Mission Log 02: Launching straight into double digits!",
+            "Mission Log 03: A stellar memory I will never forget.",
+            "Mission Log 04: You shine brighter than a supernova, Rishika.",
+            "Mission Log 05: Exploring the universe, one adventure at a time.",
+            "Mission Log 06: My absolute favorite co-pilot.",
+            "Mission Log 07: 10 years of pure awesomeness on Earth.",
+            "Mission Log 08: Even lightyears away, you are the best sister.",
+            "Mission Log 09: Defying gravity with that smile!",
+            "Mission Log 10: Houston, we have a 10-year-old!",
+            "Mission Log 11: Charting new galaxies and having fun.",
+            "Mission Log 12: You've got the energy of a shooting star.",
+            "Mission Log 13: A picture-perfect moment from orbit.",
+            "Mission Log 14: Mission Control thinks you are growing up too fast.",
+            "Mission Log 15: Out of this world and always in my heart.",
+            "Mission Log 16: The smartest little scientist I know.",
+            "Mission Log 17: Discovering new constellations with you.",
+            "Mission Log 18: No black hole could ever pull us apart.",
+            "Mission Log 19: Best little sister in the entire Milky Way.",
+            "Mission Log 20: Keep reaching for the stars, Rishika.",
+            "Mission Log 21: A truly astronomical adventure together.",
+            "Mission Log 22: My favorite future space explorer.",
+            "Mission Log 23: Happy Birthday! I love you to the moon and back."
+        ];
+
+        let fuel = 0;
+        const requiredTaps = 10;
+        
+        function addFuel() {
+            if (fuel < requiredTaps) {
+                fuel++;
+                document.getElementById('fuel-level').style.width = (fuel / requiredTaps) * 100 + '%';
+                document.getElementById('launch-rocket').style.animation = 'none';
+                if (navigator.vibrate) navigator.vibrate(50);
+                
+                if (fuel === requiredTaps) {
+                    document.getElementById('instruction').innerText = "ENGINES IGNITED!";
+                    document.getElementById('instruction').style.color = "#ff4081";
+                    
+                    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#00e5ff', '#ff4081', '#ffffff'] });
+                    setTimeout(initiateLaunch, 1500);
+                }
+            }
+        }
+
+        function initiateLaunch() {
+            const audio = document.getElementById('bg-music');
+            audio.volume = 0.6;
+            audio.play().catch(e => console.log("Audio blocked by browser"));
+            
+            document.getElementById('launchpad').style.display = 'none';
+            document.getElementById('timeline-container').style.display = 'block';
+            window.scrollTo(0, 0);
+            
+            setTimeout(() => { document.getElementById('flying-rocket').style.top = '120px'; }, 300);
+            loadTimelineImages();
+        }
+
+        function loadTimelineImages() {
+            const wrapper = document.getElementById('memories-wrapper');
+            const totalImages = 23;
+
+            for (let i = 1; i <= totalImages; i++) {
+                const card = document.createElement('div');
+                card.className = 'memory-card';
+                
+                const img = document.createElement('img');
+                img.src = `images/${i}.jpg`; 
+                img.className = 'memory-img';
+                img.onerror = function() { card.style.display = 'none'; };
+                
+                const caption = document.createElement('p');
+                caption.className = 'memory-caption';
+                // Grabs the caption from the array, or gives a default one if you didn't write 23 of them
+                caption.innerText = imageCaptions[i-1] || `Mission Log 0${i}: A beautiful memory!`;
+
+                card.appendChild(img);
+                card.appendChild(caption);
+                wrapper.appendChild(card);
+            }
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) entry.target.classList.add('reveal');
+                });
+            }, { threshold: 0.15 });
+
+            setTimeout(() => {
+                document.querySelectorAll('.memory-card').forEach(card => observer.observe(card));
+            }, 100);
+        }
+
+        function cutCake(element) {
+            // Changes the whole cake to a slice!
+            element.innerText = "🍰";
+            element.style.transform = "scale(1.2)";
+            document.querySelector('.cake-text').innerText = "Yum! Happy Birthday!";
+            
+            // Massive confetti blast from the bottom
+            confetti({
+                particleCount: 300,
+                spread: 120,
+                startVelocity: 50,
+                origin: { y: 0.9 },
+                colors: ['#ff4081', '#00e5ff', '#ffeb3b', '#ffffff']
+            });
+            
+            if (navigator.vibrate) navigator.vibrate([100, 50, 100]);
+        }
+
+        // Rocket rotation logic
+        let lastScrollTop = 0;
+        window.addEventListener('scroll', function() {
+            let st = window.pageYOffset || document.documentElement.scrollTop;
+            let rocketIcon = document.querySelector('#flying-rocket .icon');
+            
+            if (st > lastScrollTop) { rocketIcon.style.transform = "rotate(180deg) scale(1.15)"; } 
+            else { rocketIcon.style.transform = "rotate(0deg) scale(1.15)"; }
+            
+            clearTimeout(window.scrollTimeout);
+            window.scrollTimeout = setTimeout(() => {
+                rocketIcon.style.transform = st > lastScrollTop ? "rotate(180deg)" : "rotate(0deg)";
+            }, 150);
+            
+            lastScrollTop = st <= 0 ? 0 : st; 
+        }, false);
+    </script>
+</body>
+</html>
